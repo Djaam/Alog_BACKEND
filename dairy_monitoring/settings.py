@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-f@&8aa8x(cd^#bmg@$i7z47d2wj1vml8-*&vo#i*+=!ym=p25s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "easy-swine-wise.ngrok-free.app",
+    "localhost",
+]
 
 
 # Application definition
@@ -38,8 +41,25 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'monitoring',
 ]
+AUTH_USER_MODEL = 'monitoring.Farmer'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
