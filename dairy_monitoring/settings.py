@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "easy-swine-wise.ngrok-free.app",
     "localhost",
+    '127.0.0.1',
 ]
 
 
