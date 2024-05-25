@@ -101,7 +101,7 @@ def sensor_data_list(request):
 def sensor_data_detail(request, cow_id):
     cow = get_object_or_404(Cow, cow_id=cow_id)
 
-    sensor_data = SensorData.objects.filter(cow=cow)
+    sensor_data = SensorData.objects.filter(cow=cow).order_by('-timestamp')[:100]
 
     if request.method == 'GET':
         temperature_data = sensor_data.values('timestamp', 'temperature')
