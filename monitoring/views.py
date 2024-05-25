@@ -166,6 +166,14 @@ def login(request):
         
         return Response({
             'token': str(access),
+            'user': {
+                'id': user.id,
+                'fullname': user.fullname,
+                'address': user.address,
+                'farm_name': user.farm_name,
+                'date_joined': user.date_joined,
+                'email': user.email
+            }
         })
         
     except Farmer.DoesNotExist:
