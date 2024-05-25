@@ -63,9 +63,18 @@ class Farmer(AbstractBaseUser, PermissionsMixin):
 
 
 class Cow(models.Model):
+    class HealthStatus(models.TextChoices):
+        NORMAL = 'Normal', 'Normal'
+        CRITICAL = 'Critical', 'Critical'
+        UNKNOWN = 'Unknown', 'Unknown'
+
     farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE)
     cow_id = models.AutoField(primary_key=True)
-    health_status = models.CharField(max_length=100)
+    health_status = models.CharField(
+        max_length=8,
+        choices=HealthStatus.choices,
+        default=HealthStatus.UNKNOWN
+    )
 
     def __str__(self):
         return f"Cow {self.cow_id} - {self.health_status}"

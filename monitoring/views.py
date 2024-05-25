@@ -9,40 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from Crypto.Cipher import AES
-import base64
 import json
-
-
-
-AESKEY = b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F'
-
-def decrypt_data(data):
-    encrypted_bytes = base64.b64decode(data)
-    nonce = encrypted_bytes[:16]
-    ciphertext = encrypted_bytes[16:]
-    try:
-        cipher = AES.new(AESKEY, AES.MODE_GCM, nonce=nonce)
-        decrypted_data = cipher.decrypt(ciphertext)
-        return decrypted_data.decode('utf-8')
-    except Exception as e:
-        print("Error decrypting data:", e)
-        return None
-
-def parse_data(data_string):
-    data_parts = data_string.split(',')
-    data_dict = {}
-    for part in data_parts:
-        key, value = part.split(':')
-        key = key.strip().lower()
-        value = value.strip()
-        if key == 'temp':
-            value = float(value.replace(' C', ''))
-        elif key == 'steps' or key == 'id':
-            value = int(value)
-        data_dict[key] = value
-    data_json = json.dumps(data_dict)
-    return data_json
+from .utils import decrypt_data, parse_data, determine_health_status
 
 
 
@@ -142,6 +110,11 @@ def encryptData(request):
             return Response({"error": "Cow not found"}, status=status.HTTP_404_NOT_FOUND)
         sensor_data = SensorData(cow=cow, temperature=temperature, steps=steps)
         sensor_data.save()
+
+        health_status = determine_health_status(cow)
+        cow.health_status = health_status
+        print(f"Health status for cow {cow_id}: {health_status}")
+        cow.save()
 
         return Response({"message": "Data saved successfully"}, status=status.HTTP_201_CREATED)
     except Exception as e:
