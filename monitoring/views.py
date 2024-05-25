@@ -96,28 +96,24 @@ def sensor_data_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sensor_data_detail(request, cow_id):
-    cow = get_object_or_404(Cow, id=cow_id)
+    cow = get_object_or_404(Cow, cow_id=cow_id)
 
-    # Filter sensor data by cow_id
-    sensor_data = get_object_or_404(SensorData, cow=cow)
+    sensor_data = SensorData.objects.filter(cow=cow)
 
     if request.method == 'GET':
-        serializer = SensorDataSerializer(sensor_data)
-        return Response(serializer.data)
+        temperature_data = sensor_data.values('timestamp', 'temperature')
+        steps_data = sensor_data.values('timestamp', 'steps')
 
-    elif request.method == 'PUT':
-        serializer = SensorDataSerializer(sensor_data, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        response_data = {
+            'temperature': list(temperature_data),
+            'steps': list(steps_data)
+        }
 
-    elif request.method == 'DELETE':
-        sensor_data.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(response_data)
+
 
 @api_view(['POST'])
 def signup(request):

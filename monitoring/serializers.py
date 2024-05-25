@@ -19,7 +19,7 @@ class CowSerializer(serializers.ModelSerializer):
 class SensorDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = SensorData
-        fields = ['id', 'cow', 'temperature', 'steps', 'timestamp']
+        fields = "__all__"
 
 # class TreatmentSerializer(serializers.ModelSerializer):
 #     class Meta:
