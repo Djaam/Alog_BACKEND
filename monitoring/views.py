@@ -98,8 +98,11 @@ def sensor_data_list(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def sensor_data_detail(request, pk):
-    sensor_data = get_object_or_404(SensorData, pk=pk)
+def sensor_data_detail(request, cow_id):
+    cow = get_object_or_404(Cow, id=cow_id)
+
+    # Filter sensor data by cow_id
+    sensor_data = get_object_or_404(SensorData, cow=cow)
 
     if request.method == 'GET':
         serializer = SensorDataSerializer(sensor_data)
