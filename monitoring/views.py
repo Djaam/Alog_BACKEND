@@ -53,7 +53,7 @@ def cow_detail(request, pk):
 @permission_classes([IsAuthenticated])
 def sensor_data_list(request):
     if request.method == 'GET':
-        sensor_data = SensorData.objects.all()
+        sensor_data = SensorData.objects.filter(cow__farmer=request.user)
         serializer = SensorDataSerializer(sensor_data, many=True)
         return Response(serializer.data)
 
