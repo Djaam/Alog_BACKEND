@@ -42,8 +42,9 @@ These instructions will help you set up the project on your local machine for de
    ```
 
 2. Start the development server:
+   ```sh
    python manage.py runserver
-  
+     ```
 
 ## API Endpoints
 - `POST /signup/`: Create a new user account
