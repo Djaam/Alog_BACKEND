@@ -18,7 +18,7 @@ from .utils import decrypt_data, parse_data, determine_health_status
 @permission_classes([IsAuthenticated])
 def cow_list(request):
     if request.method == 'GET':
-        cows = Cow.objects.all()
+        cows = Cow.objects.filter(farmer=request.user)
         serializer = CowSerializer(cows, many=True)
         return Response(serializer.data)
 
