@@ -32,7 +32,13 @@ def cow_list(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def cow_detail(request, pk):
-    cow = get_object_or_404(Cow, pk=pk)
+    try:
+        cow = get_object_or_404(Cow, pk=pk)
+    except Cow.DoesNotExist:
+        return Response({"error": "Cow not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if cow.farmer != request.user:
+        return Response({"error": "You do not have permission to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'GET':
         serializer = CowSerializer(cow)
@@ -57,17 +63,15 @@ def sensor_data_list(request):
         serializer = SensorDataSerializer(sensor_data, many=True)
         return Response(serializer.data)
 
-    elif request.method == 'POST':
-        serializer = SensorDataSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sensor_data_detail(request, cow_id):
     cow = get_object_or_404(Cow, cow_id=cow_id)
+
+    if cow.farmer != request.user:
+        return Response({"error": "You do not have permission to access this data"}, status=status.HTTP_403_FORBIDDEN)
 
     sensor_data = SensorData.objects.filter(cow=cow).order_by('-timestamp')[:100]
 
@@ -93,7 +97,6 @@ def signup(request):
         else:
             return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(f"An error occurred during signup: {e}")
         return Response({"error": "An error occurred during signup"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
@@ -117,7 +120,6 @@ def recieveData(request):
 
         return Response({"message": "Data saved successfully"}, status=status.HTTP_201_CREATED)
     except Exception as e:
-        print(f"An error occurred: {e}")
         return Response({"error": "An error occurred during data processing"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

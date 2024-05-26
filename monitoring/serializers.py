@@ -20,8 +20,3 @@ class SensorDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = SensorData
         fields = "__all__"
-
-# class TreatmentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Treatment
-#         fields = '__all__'
