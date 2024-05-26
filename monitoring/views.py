@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 import json
-from .utils import decrypt_data, parse_data, determine_health_status
+from .utils import parse_data, determine_health_status
 
 
 
@@ -97,11 +97,10 @@ def signup(request):
         return Response({"error": "An error occurred during signup"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
-def encryptData(request):
+def recieveData(request):
     try:
-        encrypted_data = request.data.get('encrypted_data')
-        decrypted_data = decrypt_data(encrypted_data)
-        data = json.loads(parse_data(decrypted_data))
+        data = request.data.get('data')
+        data = json.loads(parse_data(data))
         cow_id = data.get('id')
         temperature = data.get('temp')
         steps = data.get('steps')

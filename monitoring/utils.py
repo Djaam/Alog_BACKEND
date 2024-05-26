@@ -5,20 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Avg
 from .models import SensorData, Cow
-from django.conf import settings
-AESKEY = settings.AESKEY
 
-def decrypt_data(data):
-    encrypted_bytes = base64.b64decode(data)
-    nonce = encrypted_bytes[:16]
-    ciphertext = encrypted_bytes[16:]
-    try:
-        cipher = AES.new(AESKEY, AES.MODE_GCM, nonce=nonce)
-        decrypted_data = cipher.decrypt(ciphertext)
-        return decrypted_data.decode('utf-8')
-    except Exception as e:
-        print("Error decrypting data:", e)
-        return None
 
 def parse_data(data_string):
     data_parts = data_string.split(',')
@@ -36,7 +23,7 @@ def parse_data(data_string):
     return data_json
 
 def determine_health_status(cow):
-    one_hour_ago = timezone.now() - timedelta(hours=1)
+    one_hour_ago = timezone.now() - timedelta(minutes=1)
     recent_data = SensorData.objects.filter(cow=cow, timestamp__gte=one_hour_ago)
     
     if not recent_data.exists():
@@ -48,7 +35,7 @@ def determine_health_status(cow):
     if avg_temperature is None or avg_steps is None:
         return Cow.HealthStatus.UNKNOWN
 
-    if avg_temperature > 39 or avg_steps < 1000:
+    if avg_temperature < 36 or avg_temperature > 38 or avg_steps > 300 or avg_steps < 150:
         return Cow.HealthStatus.CRITICAL
     else:
         return Cow.HealthStatus.NORMAL
