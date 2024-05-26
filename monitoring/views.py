@@ -11,6 +11,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 import json
 from .utils import parse_data, determine_health_status
+import os
+
+
+AUTHORIZATION_KEY = os.getenv('AUTHORIZATION_KEY', 'default_key')
 
 
 
@@ -102,6 +106,10 @@ def signup(request):
 @api_view(['POST'])
 def recieveData(request):
     try:
+        auth_key = request.headers.get('AuthorizationKey')
+        if auth_key != AUTHORIZATION_KEY:
+            return Response({"error": "Unauthorized access"}, status=status.HTTP_403_FORBIDDEN)
+
         data = request.data.get('data')
         data = json.loads(parse_data(data))
         cow_id = data.get('id')
